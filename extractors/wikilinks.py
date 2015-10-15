@@ -4,20 +4,19 @@ import argparse
 from glob import glob
 from math import log
 
-from wikipedia.exceptions import DisambiguationError, PageError
+from wikipedia.exceptions import PageError
 from feature_extractor import FeatureExtractor
 from util.cached_wikipedia import CachedWikipedia
 from extractors.lm import good_char
 
 
 class WikiLinks(FeatureExtractor):
-    def __init__(self, xml_location="data/wikifier/data/output",
-                 wikipedia="data/wikipedia"):
-        self._name = "wikilinks"
+    def __init__(self, xml_location="data/wikifier/data/output", wikipedia="data/wikipedia"):
+        super(WikiLinks, self).__init__()
+        self.name = "wikilinks"
         self._location = xml_location
         self._links = defaultdict(dict)
         self._wiki = CachedWikipedia(wikipedia)
-
         self._cache = -1
         self._matches = None
 
@@ -45,7 +44,7 @@ class WikiLinks(FeatureExtractor):
                     self._matches.add(title)
 
         total = 0
-        matches = ["|%s" % self._name]
+        matches = ["|%s" % self.name]
         display_title = "".join(x for x in good_char.findall(title) if x)
         bad = set()
         for ii in [x for x in self._matches]:

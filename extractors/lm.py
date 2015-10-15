@@ -28,7 +28,8 @@ kTOKENIZER = TreebankWordTokenizer().tokenize
 
 good_char = re.compile(r"[a-zA-Z0-9]*")
 
-class DistCounter:
+
+class DistCounter(object):
     def __init__(self):
         self._total = 0
         self._bins = 0
@@ -93,12 +94,13 @@ def trim_and_split(chain, stopwords, max_length):
 
 class LanguageModel(FeatureExtractor):
     def __init__(self, global_lms, threshold=-1):
+        super(LanguageModel, self).__init__()
+        self.name = "lm"
         self._lm = {}
         self._sent_mean = {}
         self._sent_var = {}
         self._ngram_mean = defaultdict(dict)
         self._ngram_var = defaultdict(dict)
-        self._name = "lm"
         self._globals = global_lms
         self._last_sent = ""
         self._cache = 0
@@ -211,7 +213,7 @@ class LanguageModel(FeatureExtractor):
 
     def vw_from_title(self, title, text):
         self.set_sentence(text)
-        val = ["|%s" % self._name]
+        val = ["|%s" % self.name]
         for corpus in self._lm:
             max_ngram = 0.0
             ngram_count = 0
@@ -291,7 +293,7 @@ class LanguageModel(FeatureExtractor):
                         print("TIME: %f" % (time.time() - start))
 
 
-class JelinekMercerLanguageModel:
+class JelinekMercerLanguageModel(object):
     def __init__(self, vocab_size, unigram_smooth=0.01,
                  jm_lambda=0.6, normalize_function=lower):
         self._vocab_size = vocab_size
@@ -357,7 +359,6 @@ class JelinekMercerLanguageModel:
         self._smooth_sum = self._vocab_size * self._smooth
         return self._vocab
 
-
     def tokenize_and_censor(self, sentence):
         """
         Given a sentence, yields a sentence suitable for training or testing.
@@ -395,7 +396,6 @@ class JelinekMercerLanguageModel:
     def set_jm_interp(self, val):
         self._jm_lambda = val
 
-    #@profile
     def jelinek_mercer(self, context, word, debug=False):
         """
         Return the Jelinek-Mercer log probability estimate of a word
@@ -433,7 +433,6 @@ class JelinekMercerLanguageModel:
             self._unigram.inc(word)
         self._unigram_normalizer = self._smooth_sum + self._unigram.N()
 
-    #@profile
     def mean_ll(self, tokens):
         assert isinstance(tokens, list)
 
